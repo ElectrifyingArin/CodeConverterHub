@@ -3,8 +3,9 @@ import { ConvertCodeResponse } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Copy } from "lucide-react";
+import { Copy, ChevronDown, ChevronUp, BookOpen, Code, ArrowRightLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 
 interface CodeExplanationProps {
   explanation: ConvertCodeResponse["explanation"] | null;
@@ -44,23 +45,36 @@ export function CodeExplanation({
   if (!explanation) return null;
 
   return (
-    <Card className="bg-white dark:bg-slate-800 rounded-lg shadow">
+    <Card className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
       <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-        <h3 className="font-medium">Code Conversion Explanation</h3>
+        <h3 className="font-medium flex items-center">
+          <BookOpen className="w-4 h-4 mr-2 text-primary" />
+          Code Conversion Explanation
+        </h3>
         <div className="flex gap-2">
           <Button 
             variant="outline" 
             size="sm" 
             onClick={onToggleExpand} 
-            className="text-xs px-2 py-1 h-auto rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
+            className="text-xs px-3 py-1 h-8 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 transition-all hover:shadow flex items-center gap-1"
           >
-            {expanded ? "Compact View" : "Full View"}
+            {expanded ? (
+              <>
+                <ChevronUp className="h-3 w-3" />
+                <span>Compact</span>
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3 w-3" />
+                <span>Expand</span>
+              </>
+            )}
           </Button>
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={copyExplanation} 
-            className="h-7 w-7 p-1 text-slate-500 hover:text-primary" 
+            className="h-8 w-8 rounded-full text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-700 transition-all" 
             title="Copy explanation"
           >
             <Copy className="h-4 w-4" />
@@ -69,50 +83,98 @@ export function CodeExplanation({
       </div>
       
       <Tabs defaultValue="step-by-step" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="border-b border-slate-200 dark:border-slate-700 px-4 w-full justify-start rounded-none">
-          <TabsTrigger value="step-by-step" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none">
+        <TabsList className="border-b border-slate-200 dark:border-slate-700 px-4 w-full justify-start rounded-none gap-2 h-12">
+          <TabsTrigger 
+            value="step-by-step" 
+            className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none data-[state=active]:text-primary flex items-center gap-1"
+          >
+            <Code className="h-4 w-4" />
             Step-by-Step
           </TabsTrigger>
-          <TabsTrigger value="high-level" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none">
+          <TabsTrigger 
+            value="high-level" 
+            className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none data-[state=active]:text-primary flex items-center gap-1"
+          >
+            <BookOpen className="h-4 w-4" />
             High-Level Summary
           </TabsTrigger>
-          <TabsTrigger value="language-differences" className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none">
+          <TabsTrigger 
+            value="language-differences" 
+            className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none data-[state=active]:text-primary flex items-center gap-1"
+          >
+            <ArrowRightLeft className="h-4 w-4" />
             Language Differences
           </TabsTrigger>
         </TabsList>
         
-        <div className={`p-4 overflow-auto ${expanded ? '' : 'max-h-96'}`}>
+        <motion.div 
+          className={`p-4 overflow-auto`}
+          animate={{
+            height: expanded ? 'auto' : '24rem'
+          }}
+          transition={{ duration: 0.3 }}
+        >
           <TabsContent value="step-by-step" className="mt-0 space-y-4">
             {explanation.stepByStep.map((step, index) => (
-              <div key={index} className="p-3 bg-slate-50 dark:bg-slate-900 rounded-md">
-                <h5 className="font-medium text-sm mb-2 text-primary">{step.title}</h5>
-                <div className="flex flex-col md:flex-row gap-4 text-sm">
+              <motion.div 
+                key={index} 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                className="p-4 bg-slate-50 dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"
+              >
+                <h5 className="font-medium text-sm mb-3 text-primary">{step.title}</h5>
+                <div className="flex flex-col md:flex-row gap-6 text-sm mb-3">
                   <div className="flex-1">
-                    <div className="font-mono text-xs mb-2 bg-white dark:bg-slate-800 p-2 rounded">{step.sourceCode}</div>
+                    <div className="text-xs mb-1 text-slate-500 dark:text-slate-400">Source Code:</div>
+                    <div className="font-mono text-xs p-3 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 overflow-x-auto">{step.sourceCode}</div>
                   </div>
-                  <div className="flex-1">
-                    <div className="font-mono text-xs mb-2 bg-white dark:bg-slate-800 p-2 rounded">{step.targetCode}</div>
+                  <div className="flex-1 relative">
+                    <div className="hidden md:block absolute left-0 top-1/2 -translate-x-[18px] -translate-y-1/2">
+                      <motion.div
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                      >
+                        <ArrowRightLeft className="h-5 w-5 text-primary rotate-90" />
+                      </motion.div>
+                    </div>
+                    <div className="text-xs mb-1 text-slate-500 dark:text-slate-400">Target Code:</div>
+                    <div className="font-mono text-xs p-3 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 overflow-x-auto">{step.targetCode}</div>
                   </div>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                   {step.explanation}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </TabsContent>
           
           <TabsContent value="high-level" className="mt-0">
-            <div className="prose dark:prose-invert max-w-none">
-              <p>{explanation.highLevel}</p>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="prose dark:prose-invert max-w-none bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700"
+            >
+              <p className="leading-relaxed text-slate-700 dark:text-slate-300">{explanation.highLevel}</p>
+            </motion.div>
           </TabsContent>
           
           <TabsContent value="language-differences" className="mt-0">
-            <div className="prose dark:prose-invert max-w-none">
-              <p>{explanation.languageDifferences}</p>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="prose dark:prose-invert max-w-none bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700"
+            >
+              <p className="leading-relaxed text-slate-700 dark:text-slate-300">{explanation.languageDifferences}</p>
+            </motion.div>
           </TabsContent>
-        </div>
+        </motion.div>
+        
+        {!expanded && (
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-slate-800 to-transparent pointer-events-none"></div>
+        )}
       </Tabs>
     </Card>
   );

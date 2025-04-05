@@ -14,10 +14,10 @@ export function SiteFooter() {
           
           {/* Glowing "Made by Arin" text with a completely different style */}
           <motion.div
-            className="mb-8 relative py-10 px-12 rounded-2xl"
+            className="mb-8 relative py-12 px-14 rounded-2xl"
             style={{
-              background: "linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)",
-              boxShadow: "0 0 30px rgba(79, 70, 229, 0.1)"
+              background: "linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)",
+              boxShadow: "0 0 30px rgba(79, 70, 229, 0.15)"
             }}
           >
             {/* Lightning background effects */}
@@ -32,9 +32,10 @@ export function SiteFooter() {
                 repeatType: "reverse"
               }}
             >
-              <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <path d="M30,10 L55,50 L40,50 L60,90" stroke="rgba(79, 70, 229, 0.8)" strokeWidth="0.5" fill="none" />
-                <path d="M60,20 L35,60 L50,60 L30,80" stroke="rgba(168, 85, 247, 0.8)" strokeWidth="0.5" fill="none" />
+              <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+                <path d="M30,10 L55,50 L40,50 L60,90" stroke="rgba(79, 70, 229, 0.8)" strokeWidth="1" fill="none" />
+                <path d="M60,20 L35,60 L50,60 L30,80" stroke="rgba(168, 85, 247, 0.8)" strokeWidth="1" fill="none" />
+                <path d="M45,5 L25,45 L40,45 L20,85" stroke="rgba(99, 102, 241, 0.8)" strokeWidth="0.8" fill="none" />
               </svg>
             </motion.div>
             
@@ -80,7 +81,12 @@ export function SiteFooter() {
             
             {/* Main text with glow */}
             <motion.h2 
-              className="text-3xl md:text-4xl font-bold relative bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 bg-clip-text text-transparent animate-gradient"
+              className="text-3xl md:text-4xl font-bold relative bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 bg-clip-text text-transparent animate-gradient pb-2"
+              style={{ 
+                marginBottom: "4px",
+                letterSpacing: "0.5px",
+                lineHeight: 1.4
+              }}
               animate={{
                 textShadow: [
                   "0 0 15px rgba(79, 70, 229, 0.5)",

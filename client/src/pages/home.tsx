@@ -24,9 +24,6 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="mb-8 text-center"
         >
-          <h1 className="text-4xl font-extrabold mb-3 bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
-            SourceXchange
-          </h1>
           <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             Convert code between 15+ programming languages with detailed explanations and examples.
           </p>

@@ -364,14 +364,6 @@ export function CodeConverter() {
                 onCheckedChange={setGenerateReadme}
               />
             </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="generate-api" className="text-sm">Generate API Docs</Label>
-              <Switch
-                id="generate-api"
-                checked={generateApi}
-                onCheckedChange={setGenerateApi}
-              />
-            </div>
           </div>
         </div>
       </motion.div>

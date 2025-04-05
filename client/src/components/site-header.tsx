@@ -29,19 +29,14 @@ export function SiteHeader() {
         </div>
         
         {/* Centered logo */}
-        <div className="flex flex-col items-center gap-1 absolute left-1/2 transform -translate-x-1/2">
-          <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 flex items-center justify-center">
-              <div className="absolute inset-0 bg-primary rounded-full opacity-20 animate-pulse"></div>
-              <Code className="w-6 h-6 text-primary relative" />
-            </div>
-            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
-              SourceXchange
-            </Link>
+        <div className="flex items-center gap-3 absolute left-1/2 transform -translate-x-1/2">
+          <div className="relative w-10 h-10 flex items-center justify-center">
+            <div className="absolute inset-0 bg-primary rounded-full opacity-20 animate-pulse"></div>
+            <Code className="w-6 h-6 text-primary relative" />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Convert code between 15+ programming languages with detailed explanations.
-          </p>
+          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
+            SourceXchange
+          </Link>
         </div>
         
         {/* Right side */}

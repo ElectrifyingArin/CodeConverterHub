@@ -14,37 +14,184 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
-const SAMPLE_CODE = `// Function to calculate fibonacci sequence
-function fibonacci(n) {
-  if (n <= 1) return n;
-  
-  let fib = [0, 1];
-  
-  for (let i = 2; i <= n; i++) {
-    fib[i] = fib[i-1] + fib[i-2];
-  }
-  
-  return fib[n];
+// Define typed code examples for different languages
+interface CodeExamples {
+  [key: string]: string;
 }
 
-// Calculate first 10 fibonacci numbers
-const results = [];
-for (let i = 0; i < 10; i++) {
-  results.push(fibonacci(i));
+const CODE_EXAMPLES: CodeExamples = {
+  javascript: `// Simple function to add two numbers
+function add(a, b) {
+  return a + b;
 }
 
-console.log("Fibonacci sequence:", results);`;
+// Calculate sum of 5 and 3
+const result = add(5, 3);
+console.log("The sum is:", result);`,
+
+  python: `# Simple function to add two numbers
+def add(a, b):
+    return a + b
+
+# Calculate sum of 5 and 3
+result = add(5, 3)
+print("The sum is:", result)`,
+
+  typescript: `// Simple function to add two numbers
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+// Calculate sum of 5 and 3
+const result = add(5, 3);
+console.log("The sum is:", result);`,
+
+  java: `// Simple function to add two numbers
+public class Calculator {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+    
+    public static void main(String[] args) {
+        // Calculate sum of 5 and 3
+        int result = add(5, 3);
+        System.out.println("The sum is: " + result);
+    }
+}`,
+
+  csharp: `// Simple function to add two numbers
+using System;
+
+class Calculator {
+    static int Add(int a, int b) {
+        return a + b;
+    }
+    
+    static void Main() {
+        // Calculate sum of 5 and 3
+        int result = Add(5, 3);
+        Console.WriteLine("The sum is: " + result);
+    }
+}`,
+
+  go: `// Simple function to add two numbers
+package main
+
+import "fmt"
+
+func add(a, b int) int {
+    return a + b
+}
+
+func main() {
+    // Calculate sum of 5 and 3
+    result := add(5, 3)
+    fmt.Println("The sum is:", result)
+}`,
+
+  ruby: `# Simple function to add two numbers
+def add(a, b)
+  return a + b
+end
+
+# Calculate sum of 5 and 3
+result = add(5, 3)
+puts "The sum is: #{result}"`,
+
+  php: `<?php
+// Simple function to add two numbers
+function add($a, $b) {
+    return $a + $b;
+}
+
+// Calculate sum of 5 and 3
+$result = add(5, 3);
+echo "The sum is: " . $result;
+?>`,
+
+  swift: `// Simple function to add two numbers
+func add(_ a: Int, _ b: Int) -> Int {
+    return a + b
+}
+
+// Calculate sum of 5 and 3
+let result = add(5, 3)
+print("The sum is: \(result)")`,
+
+  rust: `// Simple function to add two numbers
+fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+fn main() {
+    // Calculate sum of 5 and 3
+    let result = add(5, 3);
+    println!("The sum is: {}", result);
+}`,
+
+  kotlin: `// Simple function to add two numbers
+fun add(a: Int, b: Int): Int {
+    return a + b
+}
+
+fun main() {
+    // Calculate sum of 5 and 3
+    val result = add(5, 3)
+    println("The sum is: $result")
+}`,
+
+  dart: `// Simple function to add two numbers
+int add(int a, int b) {
+  return a + b;
+}
+
+void main() {
+  // Calculate sum of 5 and 3
+  var result = add(5, 3);
+  print("The sum is: $result");
+}`,
+
+  r: `# Simple function to add two numbers
+add <- function(a, b) {
+  return(a + b)
+}
+
+# Calculate sum of 5 and 3
+result <- add(5, 3)
+print(paste("The sum is:", result))`,
+
+  julia: `# Simple function to add two numbers
+function add(a, b)
+    return a + b
+end
+
+# Calculate sum of 5 and 3
+result = add(5, 3)
+println("The sum is: $result")`,
+
+  shell: `#!/bin/bash
+# Simple function to add two numbers
+add() {
+  echo $(($1 + $2))
+}
+
+# Calculate sum of 5 and 3
+result=$(add 5 3)
+echo "The sum is: $result"`,
+};
 
 export function CodeConverter() {
-  const [sourceCode, setSourceCode] = useState(SAMPLE_CODE);
-  const [sourceLanguage, setSourceLanguage] = useState("javascript");
-  const [targetLanguage, setTargetLanguage] = useState("python");
+  const [sourceLanguage, setSourceLanguage] = useState<string>("javascript");
+  const [targetLanguage, setTargetLanguage] = useState<string>("python");
   const [skillLevel, setSkillLevel] = useState("beginner");
   const [generateReadme, setGenerateReadme] = useState(false);
   const [generateApi, setGenerateApi] = useState(false);
   const [explanationExpanded, setExplanationExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const { toast } = useToast();
+  
+  // Use the example for the selected language, or default to JavaScript
+  const [sourceCode, setSourceCode] = useState(CODE_EXAMPLES.javascript);
 
   const {
     convert,
@@ -113,8 +260,18 @@ export function CodeConverter() {
     setTargetLanguage(tempLang);
   };
 
-  // Make sure languages are different
+  // Make sure languages are different and update source code
   useEffect(() => {
+    // Update source code when language changes - safely access as key
+    const langExample = sourceLanguage as keyof typeof CODE_EXAMPLES;
+    if (CODE_EXAMPLES[langExample]) {
+      setSourceCode(CODE_EXAMPLES[langExample]);
+    } else {
+      // Fallback to JavaScript if the language isn't in our examples
+      setSourceCode(CODE_EXAMPLES.javascript);
+    }
+    
+    // Ensure source and target languages are different
     if (sourceLanguage === targetLanguage) {
       // Default to Python if JavaScript is selected for both
       if (sourceLanguage === "javascript") {

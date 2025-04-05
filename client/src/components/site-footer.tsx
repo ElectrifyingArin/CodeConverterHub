@@ -1,6 +1,5 @@
-import { Link } from "wouter";
-import { Github } from "lucide-react";
 import { motion } from "framer-motion";
+import { Code, Heart } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -11,15 +10,12 @@ export function SiteFooter() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-4"
+            className="mb-8"
           >
             <div className="flex items-center justify-center gap-2">
               <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 rounded-lg animate-pulse"></div>
-                <svg className="w-8 h-8 text-primary relative" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M14 12L8 7V17L14 12Z" fill="currentColor"/>
-                  <path d="M16 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
+                <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse"></div>
+                <Code className="w-6 h-6 text-primary relative" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
                 SourceXchange
@@ -30,38 +26,85 @@ export function SiteFooter() {
             </p>
           </motion.div>
           
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <motion.a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              title="GitHub Repository"
-            >
-              <Github size={18} />
-            </motion.a>
-          </div>
+          {/* Glowing "Made by Arin" text */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ 
+              duration: 0.8,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+            className="mb-8 relative py-8"
+          >
+            {/* Glowing orb effect behind the text */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-purple-500/30 to-primary/30 blur-2xl rounded-full animate-pulse"></div>
+            
+            {/* Sparkle effects */}
+            <motion.div
+              className="absolute top-0 left-1/4 w-1 h-1 bg-white rounded-full"
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.5, 1, 0.5]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                repeatType: "loop"
+              }}
+            />
+            <motion.div
+              className="absolute bottom-1/4 right-1/4 w-1 h-1 bg-white rounded-full"
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.5, 1, 0.5]
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                repeatType: "loop",
+                delay: 0.5
+              }}
+            />
+            <motion.div
+              className="absolute top-1/3 right-1/3 w-1 h-1 bg-white rounded-full"
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.5, 1, 0.5]
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                repeatType: "loop",
+                delay: 1
+              }}
+            />
+            
+            {/* Text with glowing animation */}
+            <h2 className="text-2xl md:text-3xl font-bold relative bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent animate-gradient">
+              Made by Arin
+            </h2>
+            
+            {/* Heart icon with animation */}
+            <div className="flex justify-center mt-4">
+              <motion.div
+                animate={{
+                  scale: [1, 1.2, 1],
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+              >
+                <Heart className="w-6 h-6 text-red-500 drop-shadow-glow" />
+              </motion.div>
+            </div>
+          </motion.div>
           
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4">
-            <Link href="/examples" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors">
-              Examples
-            </Link>
-            <Link href="/privacy" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors">
-              Terms
-            </Link>
-          </div>
-          
-          <div className="text-center">
+          <div className="text-center mt-4">
             <p className="text-xs text-slate-500 dark:text-slate-400">
               © {new Date().getFullYear()} SourceXchange. All rights reserved.
-            </p>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-              Powered by GitHub API
             </p>
           </div>
         </div>

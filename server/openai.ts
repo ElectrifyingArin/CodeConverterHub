@@ -1,17 +1,22 @@
 import OpenAI from "openai";
 import { ConvertCodeRequest, ConvertCodeResponse } from "@shared/schema";
+import fetch from "node-fetch";
 
-// Initialize OpenAI client
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Initialize the OpenAI client with the API key
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY 
+});
 
-// Main function to convert code using OpenAI's GPT-4o model
+// Main function to convert code using the OpenAI GPT-4o model
 export async function convertCodeWithOpenAI(
   request: ConvertCodeRequest
 ): Promise<ConvertCodeResponse> {
   const { sourceCode, sourceLanguage, targetLanguage, skillLevel, generateReadme, generateApi } = request;
 
+  console.log(`Starting code conversion from ${sourceLanguage} to ${targetLanguage}`);
+  
   try {
-    // Prepare system prompt with instructions
+    // Prepare system prompt with instructions for the AI
     const systemPrompt = `You are an expert code converter specializing in translating code between programming languages.
 Your task is to convert code from ${sourceLanguage} to ${targetLanguage}.
 Provide detailed explanations appropriate for a ${skillLevel} level programmer.
@@ -33,6 +38,7 @@ Follow these steps:
       userPrompt += "Also generate API documentation for the converted code.\n";
     }
     
+    // Add the expected JSON response structure to the prompt
     userPrompt += `Respond in JSON format with the following structure:
 {
   "targetCode": "The full converted code",
@@ -51,6 +57,7 @@ Follow these steps:
 }`;
 
     // Call OpenAI API with chat completion
+    console.log("Calling OpenAI API...");
     const response = await openai.chat.completions.create({
       model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       messages: [
@@ -63,11 +70,18 @@ Follow these steps:
 
     // Parse the response
     const content = response.choices[0].message.content || "";
-    const result = JSON.parse(content) as ConvertCodeResponse;
+    console.log("Received response from OpenAI API, parsing result...");
     
-    return result;
+    try {
+      const result = JSON.parse(content) as ConvertCodeResponse;
+      console.log("Successfully converted code using OpenAI API");
+      return result;
+    } catch (parseError) {
+      console.error("Error parsing OpenAI response:", parseError);
+      throw new Error(`Failed to parse OpenAI response: ${parseError.message}`);
+    }
   } catch (error) {
-    console.error("Error calling OpenAI API:", error);
-    throw new Error(`Failed to convert code: ${(error as Error).message}`);
+    console.error("Error in code conversion:", error);
+    throw error;
   }
 }

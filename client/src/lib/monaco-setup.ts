@@ -3,18 +3,20 @@
 
 import * as monaco from 'monaco-editor';
 
-// Set up Monaco editor to work without dedicated web workers
-// This is a more robust approach that allows for better fallback behavior
+// Simplest Monaco editor setup that works well in Replit
 export function initMonaco() {
   try {
-    // Configure Monaco environment to use simple global scripts instead of web workers
-    window.MonacoEnvironment = {
-      // Disable workers completely and fallback to synchronous in-browser implementation
-      getWorker: function() {
-        return {
-          postMessage: () => {},
-          addEventListener: () => {}
-        };
+    // Use the simplest possible setup for Monaco without workers
+    self.MonacoEnvironment = {
+      getWorkerUrl: function(_moduleId: string, _label: string) {
+        // This returns an empty script that does nothing
+        // but prevents errors while still allowing basic functionality
+        return 'data:text/javascript;charset=utf-8,' + encodeURIComponent(`
+          self.onmessage = function() {
+            // Minimal no-op worker
+            self.postMessage({});
+          };
+        `);
       }
     };
 
@@ -24,7 +26,15 @@ export function initMonaco() {
       allowNonTsExtensions: true
     });
 
-    // Additional Monaco configuration can go here
+    // Reduce features to improve performance
+    monaco.editor.setTheme('vs');
+    
+    // Disable unnecessary features
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: false
+    });
+
     console.log('Monaco editor environment initialized');
   } catch (err) {
     console.error('Failed to initialize Monaco editor:', err);

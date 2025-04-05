@@ -20,16 +20,13 @@ interface CodeExamples {
   [key: string]: string;
 }
 
-// Export the interface for code examples
-export interface CodeExamplesCollection {
+// Code examples organized by complexity level and language
+const CODE_EXAMPLES: {
   simple: CodeExamples;
   complex: CodeExamples;
-}
-
-// Code examples organized by complexity level and language
-export const CODE_EXAMPLES: CodeExamplesCollection = {
+} = {
   simple: {
-  javascript: `// Simple function to add two numbers
+    javascript: `// Simple function to add two numbers
 function add(a, b) {
   return a + b;
 }
@@ -38,7 +35,7 @@ function add(a, b) {
 const result = add(5, 3);
 console.log("The sum is:", result);`,
 
-  python: `# Simple function to add two numbers
+    python: `# Simple function to add two numbers
 def add(a, b):
     return a + b
 
@@ -46,7 +43,7 @@ def add(a, b):
 result = add(5, 3)
 print("The sum is:", result)`,
 
-  typescript: `// Simple function to add two numbers
+    typescript: `// Simple function to add two numbers
 function add(a: number, b: number): number {
   return a + b;
 }
@@ -55,7 +52,7 @@ function add(a: number, b: number): number {
 const result = add(5, 3);
 console.log("The sum is:", result);`,
 
-  java: `// Simple function to add two numbers
+    java: `// Simple function to add two numbers
 public class Calculator {
     public static int add(int a, int b) {
         return a + b;
@@ -68,7 +65,7 @@ public class Calculator {
     }
 }`,
 
-  csharp: `// Simple function to add two numbers
+    csharp: `// Simple function to add two numbers
 using System;
 
 class Calculator {
@@ -83,7 +80,7 @@ class Calculator {
     }
 }`,
 
-  go: `// Simple function to add two numbers
+    go: `// Simple function to add two numbers
 package main
 
 import "fmt"
@@ -98,7 +95,7 @@ func main() {
     fmt.Println("The sum is:", result)
 }`,
 
-  ruby: `# Simple function to add two numbers
+    ruby: `# Simple function to add two numbers
 def add(a, b)
   return a + b
 end
@@ -107,7 +104,7 @@ end
 result = add(5, 3)
 puts "The sum is: #{result}"`,
 
-  php: `<?php
+    php: `<?php
 // Simple function to add two numbers
 function add($a, $b) {
     return $a + $b;
@@ -118,16 +115,16 @@ $result = add(5, 3);
 echo "The sum is: " . $result;
 ?>`,
 
-  swift: `// Simple function to add two numbers
+    swift: `// Simple function to add two numbers
 func add(_ a: Int, _ b: Int) -> Int {
     return a + b
 }
 
 // Calculate sum of 5 and 3
 let result = add(5, 3)
-print("The sum is: \(result)")`,
+print("The sum is: \\(result)")`,
 
-  rust: `// Simple function to add two numbers
+    rust: `// Simple function to add two numbers
 fn add(a: i32, b: i32) -> i32 {
     a + b
 }
@@ -138,7 +135,7 @@ fn main() {
     println!("The sum is: {}", result);
 }`,
 
-  kotlin: `// Simple function to add two numbers
+    kotlin: `// Simple function to add two numbers
 fun add(a: Int, b: Int): Int {
     return a + b
 }
@@ -149,7 +146,7 @@ fun main() {
     println("The sum is: $result")
 }`,
 
-  dart: `// Simple function to add two numbers
+    dart: `// Simple function to add two numbers
 int add(int a, int b) {
   return a + b;
 }
@@ -160,7 +157,7 @@ void main() {
   print("The sum is: $result");
 }`,
 
-  r: `# Simple function to add two numbers
+    r: `# Simple function to add two numbers
 add <- function(a, b) {
   return(a + b)
 }
@@ -169,7 +166,7 @@ add <- function(a, b) {
 result <- add(5, 3)
 print(paste("The sum is:", result))`,
 
-  julia: `# Simple function to add two numbers
+    julia: `# Simple function to add two numbers
 function add(a, b)
     return a + b
 end
@@ -178,7 +175,7 @@ end
 result = add(5, 3)
 println("The sum is: $result")`,
 
-  shell: `#!/bin/bash
+    shell: `#!/bin/bash
 # Simple function to add two numbers
 add() {
   echo $(($1 + $2))
@@ -186,7 +183,7 @@ add() {
 
 # Calculate sum of 5 and 3
 result=$(add 5 3)
-echo "The sum is: $result"`,
+echo "The sum is: $result"`
   },
   complex: {
     javascript: `// Async data fetching with error handling
@@ -479,9 +476,7 @@ class WorkProcessor {
         // Start processing
         processor.process(workItems);
     }
-}`,
-
-    // Add more complex examples for other languages as needed
+}`
   }
 };
 
@@ -492,12 +487,10 @@ export function CodeConverter() {
   const [generateReadme, setGenerateReadme] = useState(false);
   const [generateApi, setGenerateApi] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [complexityLevel, setComplexityLevel] = useState<"simple" | "complex">("simple");
   const { toast } = useToast();
   
-  // Add state for complexity level
-  const [complexityLevel, setComplexityLevel] = useState<"simple" | "complex">("simple");
-  
-  // Source code state - initialize empty 
+  // Source code state
   const [sourceCode, setSourceCode] = useState("");
 
   const {
@@ -722,7 +715,7 @@ export function CodeConverter() {
       <div className="lg:col-span-4 space-y-6">
         {/* Code editors */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-          {/* Cute mascots loading animation */}
+          {/* Loading animation */}
           <AnimatePresence>
             {(isAnimating || isConverting) && (
               <motion.div 
@@ -850,72 +843,50 @@ export function CodeConverter() {
         <AnimatePresence>
           {runOutput && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
               <OutputConsole output={runOutput} />
             </motion.div>
           )}
         </AnimatePresence>
-        
-        {/* Additional outputs */}
+
+        {/* Documentation panels */}
         <AnimatePresence>
           {result?.readme && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden"
+              className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 p-4 overflow-hidden"
             >
-              <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                <h3 className="font-medium">Generated README</h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => copyCode(result.readme!)}
-                  className="h-8 w-8 rounded-full text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
-                  title="Copy README"
-                >
-                  <Clipboard className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="p-4 max-h-96 overflow-auto">
-                <div className="prose dark:prose-invert max-w-none">
-                  <pre className="bg-slate-50 dark:bg-slate-900 p-4 rounded">{result.readme}</pre>
-                </div>
+              <h3 className="font-semibold mb-4">README Documentation</h3>
+              <div className="prose dark:prose-invert max-w-none">
+                {result.readme.split('\n').map((line, i) => (
+                  <p key={i}>{line}</p>
+                ))}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-        
+
         <AnimatePresence>
-          {result?.apiDocs && (
+          {result?.api && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden"
+              className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 p-4 overflow-hidden"
             >
-              <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                <h3 className="font-medium">Generated API Documentation</h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => copyCode(result.apiDocs!)}
-                  className="h-8 w-8 rounded-full text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
-                  title="Copy API Docs"
-                >
-                  <Clipboard className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="p-4 max-h-96 overflow-auto">
-                <div className="prose dark:prose-invert max-w-none">
-                  <pre className="bg-slate-50 dark:bg-slate-900 p-4 rounded">{result.apiDocs}</pre>
-                </div>
+              <h3 className="font-semibold mb-4">API Documentation</h3>
+              <div className="prose dark:prose-invert max-w-none">
+                {result.api.split('\n').map((line, i) => (
+                  <p key={i}>{line}</p>
+                ))}
               </div>
             </motion.div>
           )}

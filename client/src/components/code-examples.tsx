@@ -1,18 +1,26 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CodeEditor } from "@/components/ui/code-editor";
 import { getLanguageById } from "@/lib/supported-languages";
-import { SupportedLanguage } from "@/lib/supported-languages";
-import { ChevronLeft, ChevronRight, Copy } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Code2, ArrowUpDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { CODE_EXAMPLES, CodeExamplesCollection } from "@/components/code-converter";
 
-// Define the example code snippets
-const codeExamples = [
+type CodeExampleDisplay = {
+  title: string;
+  language: string;
+  code: string;
+  complexity: "simple" | "complex";
+};
+
+// Our custom examples (in addition to the shared CODE_EXAMPLES)
+const codeExamples: CodeExampleDisplay[] = [
   {
     title: "Fibonacci Sequence",
     language: "javascript",
+    complexity: "simple",
     code: `// Function to calculate fibonacci sequence
 function fibonacci(n) {
   if (n <= 1) return n;
@@ -37,6 +45,7 @@ console.log("Fibonacci sequence:", results);`
   {
     title: "Binary Search Algorithm",
     language: "javascript",
+    complexity: "simple", 
     code: `// Binary search implementation
 function binarySearch(arr, target) {
   let left = 0;
@@ -66,6 +75,7 @@ console.log(\`Found target \${target} at index: \${result}\`);`
   {
     title: "Simple Todo App",
     language: "javascript",
+    complexity: "simple",
     code: `// Todo list implementation
 class TodoList {
   constructor() {
@@ -105,6 +115,7 @@ console.log("Todo list:", todoList.getTodos());`
   {
     title: "API Data Fetching",
     language: "javascript",
+    complexity: "complex",
     code: `// Fetch data from a REST API
 async function fetchUserData(userId) {
   try {
@@ -142,6 +153,7 @@ displayUserInfo(123);`
   {
     title: "Sorting Algorithms",
     language: "javascript",
+    complexity: "complex",
     code: `// Bubble sort implementation
 function bubbleSort(arr) {
   const len = arr.length;
@@ -182,22 +194,30 @@ console.log("Quick sort:", quickSort([...unsortedArray]));`
   }
 ];
 
-export function CodeExamples() {
+export function CodeExamples({ complexity = "simple" }: { complexity?: "simple" | "complex" }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<number>(0);
   const { toast } = useToast();
+  
+  // Filter examples by complexity
+  const filteredExamples = codeExamples.filter(example => example.complexity === complexity);
+  
+  // Reset current index when complexity changes
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [complexity]);
 
   const goToPrevious = () => {
     setDirection(-1);
     setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? codeExamples.length - 1 : prevIndex - 1
+      prevIndex === 0 ? filteredExamples.length - 1 : prevIndex - 1
     );
   };
 
   const goToNext = () => {
     setDirection(1);
     setCurrentIndex((prevIndex) => 
-      prevIndex === codeExamples.length - 1 ? 0 : prevIndex + 1
+      prevIndex === filteredExamples.length - 1 ? 0 : prevIndex + 1
     );
   };
 
@@ -209,7 +229,7 @@ export function CodeExamples() {
     });
   };
 
-  const currentExample = codeExamples[currentIndex];
+  const currentExample = filteredExamples[currentIndex];
   const language = getLanguageById(currentExample.language);
 
   const slideVariants = {
@@ -220,6 +240,7 @@ export function CodeExamples() {
     center: {
       x: 0,
       opacity: 1,
+      zIndex: 1,
     },
     exit: (direction: number) => ({
       x: direction < 0 ? 1000 : -1000,
@@ -233,8 +254,8 @@ export function CodeExamples() {
         Code Examples
       </h2>
       
-      <div className="relative mx-auto max-w-4xl">
-        <AnimatePresence custom={direction} initial={false}>
+      <div className="relative mx-auto max-w-4xl h-[400px]">
+        <AnimatePresence custom={direction} initial={false} mode="wait">
           <motion.div
             key={currentIndex}
             custom={direction}
@@ -246,7 +267,7 @@ export function CodeExamples() {
               x: { type: "spring", stiffness: 300, damping: 30 },
               opacity: { duration: 0.2 },
             }}
-            className="w-full"
+            className="w-full absolute inset-0"
           >
             <Card className="shadow-lg border-2 border-slate-200 dark:border-slate-700">
               <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
@@ -284,7 +305,7 @@ export function CodeExamples() {
           <ChevronLeft className="h-6 w-6" />
         </Button>
         <div className="flex space-x-2 items-center">
-          {codeExamples.map((_, index) => (
+          {filteredExamples.map((_, index) => (
             <button
               key={index}
               onClick={() => {

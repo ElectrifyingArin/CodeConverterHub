@@ -4,13 +4,23 @@ import { SiteFooter } from "@/components/site-footer";
 import { CodeConverter } from "@/components/code-converter";
 import { CodeExamples } from "@/components/code-examples";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowUpDown } from "lucide-react";
 
 export default function Home() {
   const [showExamples, setShowExamples] = useState(false);
+  // Add complexity state
+  const [complexity, setComplexity] = useState<"simple" | "complex">("simple");
 
   // Switch between converter and examples tabs
   const toggleView = (view: 'converter' | 'examples') => {
     setShowExamples(view === 'examples');
+  };
+
+  // Toggle between simple and complex examples
+  const toggleComplexity = () => {
+    setComplexity(prev => prev === "simple" ? "complex" : "simple");
   };
 
   return (
@@ -54,12 +64,39 @@ export default function Home() {
           </div>
         </div>
         
+        {/* Complexity selector (only visible when showing examples) */}
+        {showExamples && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 flex justify-center"
+          >
+            <div className="flex items-center space-x-2 bg-white dark:bg-slate-800 p-2 rounded-md shadow-sm">
+              <span className="text-sm text-slate-500 dark:text-slate-400">Complexity:</span>
+              <Button
+                onClick={toggleComplexity}
+                variant="outline"
+                size="sm"
+                className="flex items-center space-x-1"
+              >
+                <span className="capitalize">{complexity}</span>
+                <ArrowUpDown className="h-3.5 w-3.5 opacity-70" />
+              </Button>
+            </div>
+          </motion.div>
+        )}
+        
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.1 }}
+          key={`view-${showExamples}-${complexity}`} // Re-render on changes
         >
-          {showExamples ? <CodeExamples /> : <CodeConverter />}
+          {showExamples ? (
+            <CodeExamples complexity={complexity} />
+          ) : (
+            <CodeConverter />
+          )}
         </motion.div>
       </main>
       

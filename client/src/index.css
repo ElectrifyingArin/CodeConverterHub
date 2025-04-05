@@ -52,3 +52,8 @@
   filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.7)) 
          drop-shadow(0 0 10px rgba(239, 68, 68, 0.5));
 }
+
+.drop-shadow-lightning {
+  filter: drop-shadow(0 0 5px rgba(250, 204, 21, 0.8)) 
+         drop-shadow(0 0 15px rgba(250, 204, 21, 0.6));
+}

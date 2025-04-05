@@ -501,8 +501,6 @@ export function CodeConverter() {
             >
               <CodeExplanation
                 explanation={result.explanation}
-                expanded={true}
-                onToggleExpand={() => {/* No toggling */}}
               />
             </motion.div>
           )}

@@ -3,20 +3,16 @@ import { ConvertCodeResponse } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Copy, ChevronDown, ChevronUp, BookOpen, Code, ArrowRightLeft } from "lucide-react";
+import { Copy, BookOpen, Code, ArrowRightLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
 interface CodeExplanationProps {
   explanation: ConvertCodeResponse["explanation"] | null;
-  expanded: boolean;
-  onToggleExpand: () => void;
 }
 
 export function CodeExplanation({
   explanation,
-  expanded,
-  onToggleExpand,
 }: CodeExplanationProps) {
   const [activeTab, setActiveTab] = useState("step-by-step");
   const { toast } = useToast();
@@ -52,24 +48,6 @@ export function CodeExplanation({
           Code Conversion Explanation
         </h3>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onToggleExpand} 
-            className="text-xs px-3 py-1 h-8 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 transition-all hover:shadow flex items-center gap-1"
-          >
-            {expanded ? (
-              <>
-                <ChevronUp className="h-3 w-3" />
-                <span>Compact</span>
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-3 w-3" />
-                <span>Expand</span>
-              </>
-            )}
-          </Button>
           <Button 
             variant="ghost" 
             size="icon" 
@@ -107,13 +85,7 @@ export function CodeExplanation({
           </TabsTrigger>
         </TabsList>
         
-        <motion.div 
-          className={`p-4 overflow-auto`}
-          animate={{
-            height: expanded ? 'auto' : '24rem'
-          }}
-          transition={{ duration: 0.3 }}
-        >
+        <div className="p-4 overflow-auto h-[30rem]">
           <TabsContent value="step-by-step" className="mt-0 space-y-4">
             {explanation.stepByStep.map((step, index) => (
               <motion.div 
@@ -170,11 +142,7 @@ export function CodeExplanation({
               <p className="leading-relaxed text-slate-700 dark:text-slate-300">{explanation.languageDifferences}</p>
             </motion.div>
           </TabsContent>
-        </motion.div>
-        
-        {!expanded && (
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-slate-800 to-transparent pointer-events-none"></div>
-        )}
+        </div>
       </Tabs>
     </Card>
   );

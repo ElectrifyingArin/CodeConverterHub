@@ -22,24 +22,18 @@ export function SiteFooter() {
               <h4 className="text-sm font-semibold mb-2">Resources</h4>
               <ul className="space-y-1">
                 <li>
-                  <Link href="/documentation">
-                    <a className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
-                      Documentation
-                    </a>
+                  <Link href="/documentation" className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
+                    Documentation
                   </Link>
                 </li>
                 <li>
-                  <Link href="/api">
-                    <a className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
-                      API Reference
-                    </a>
+                  <Link href="/api" className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
+                    API Reference
                   </Link>
                 </li>
                 <li>
-                  <Link href="/examples">
-                    <a className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
-                      Examples
-                    </a>
+                  <Link href="/examples" className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
+                    Examples
                   </Link>
                 </li>
               </ul>
@@ -48,24 +42,18 @@ export function SiteFooter() {
               <h4 className="text-sm font-semibold mb-2">Company</h4>
               <ul className="space-y-1">
                 <li>
-                  <Link href="/about">
-                    <a className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
-                      About
-                    </a>
+                  <Link href="/about" className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
+                    About
                   </Link>
                 </li>
                 <li>
-                  <Link href="/blog">
-                    <a className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
-                      Blog
-                    </a>
+                  <Link href="/blog" className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
+                    Blog
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact">
-                    <a className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
-                      Contact
-                    </a>
+                  <Link href="/contact" className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
+                    Contact
                   </Link>
                 </li>
               </ul>
@@ -74,17 +62,13 @@ export function SiteFooter() {
               <h4 className="text-sm font-semibold mb-2">Legal</h4>
               <ul className="space-y-1">
                 <li>
-                  <Link href="/privacy">
-                    <a className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
-                      Privacy
-                    </a>
+                  <Link href="/privacy" className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
+                    Privacy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms">
-                    <a className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
-                      Terms
-                    </a>
+                  <Link href="/terms" className="text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">
+                    Terms
                   </Link>
                 </li>
               </ul>

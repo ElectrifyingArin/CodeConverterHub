@@ -16,8 +16,8 @@ export function SiteHeader() {
             <path d="M14 12L8 7V17L14 12Z" fill="currentColor"/>
             <path d="M16 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
-          <Link href="/">
-            <a className="text-xl font-bold">SourceXchange</a>
+          <Link href="/" className="text-xl font-bold">
+            SourceXchange
           </Link>
         </div>
         
@@ -37,14 +37,14 @@ export function SiteHeader() {
           </Button>
           
           <nav className="hidden sm:flex items-center space-x-6">
-            <Link href="/documentation">
-              <a className="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors">Documentation</a>
+            <Link href="/documentation" className="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors">
+              Documentation
             </Link>
-            <Link href="/examples">
-              <a className="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors">Examples</a>
+            <Link href="/examples" className="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors">
+              Examples
             </Link>
-            <Link href="/about">
-              <a className="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors">About</a>
+            <Link href="/about" className="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors">
+              About
             </Link>
           </nav>
           
@@ -60,14 +60,14 @@ export function SiteHeader() {
           
           {mobileMenuOpen && (
             <div className="absolute top-full right-0 w-48 mt-2 py-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg z-50">
-              <Link href="/documentation">
-                <a className="block px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700">Documentation</a>
+              <Link href="/documentation" className="block px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700">
+                Documentation
               </Link>
-              <Link href="/examples">
-                <a className="block px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700">Examples</a>
+              <Link href="/examples" className="block px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700">
+                Examples
               </Link>
-              <Link href="/about">
-                <a className="block px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700">About</a>
+              <Link href="/about" className="block px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700">
+                About
               </Link>
             </div>
           )}

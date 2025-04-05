@@ -4,6 +4,7 @@ import { SkillLevelSelector } from "@/components/skill-level-selector";
 import { CodeEditor } from "@/components/ui/code-editor";
 import { CodeExplanation } from "@/components/code-explanation";
 import { OutputConsole } from "@/components/output-console";
+import { CodeLoading } from "@/components/code-loading";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -186,7 +187,6 @@ export function CodeConverter() {
   const [skillLevel, setSkillLevel] = useState("beginner");
   const [generateReadme, setGenerateReadme] = useState(false);
   const [generateApi, setGenerateApi] = useState(false);
-  const [explanationExpanded, setExplanationExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const { toast } = useToast();
   
@@ -338,13 +338,25 @@ export function CodeConverter() {
             disabled={isConverting || isAnimating}
           >
             {isConverting ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+              <motion.div
+                className="flex items-center justify-center"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <span className="inline-block mr-2 relative">
+                  <motion.span
+                    className="absolute inset-0 rounded-full bg-white/30"
+                    animate={{ scale: [1, 1.5, 1], opacity: [0.7, 0, 0.7] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <svg className="w-4 h-4 text-white relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 8L3 12L7 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M17 8L21 12L17 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M10 4L14 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
                 Converting...
-              </>
+              </motion.div>
             ) : (
               "Convert Code"
             )}
@@ -372,28 +384,21 @@ export function CodeConverter() {
       <div className="lg:col-span-4 space-y-6">
         {/* Code editors */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-          {/* Animation overlay when converting */}
+          {/* Cute mascots loading animation */}
           <AnimatePresence>
-            {isAnimating && (
+            {(isAnimating || isConverting) && (
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/30 backdrop-blur-sm rounded-lg"
               >
-                <motion.div 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: [0, 1.2, 1] }}
-                  transition={{ duration: 0.5 }}
-                  className="w-24 h-24 rounded-full bg-primary flex items-center justify-center"
-                >
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                  >
-                    <ArrowRightLeft className="w-10 h-10 text-white" />
-                  </motion.div>
-                </motion.div>
+                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-4">
+                  <CodeLoading
+                    isLoading={true}
+                    text={`Converting ${getLanguageById(sourceLanguage).displayName} to ${getLanguageById(targetLanguage).displayName}...`}
+                  />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -496,8 +501,8 @@ export function CodeConverter() {
             >
               <CodeExplanation
                 explanation={result.explanation}
-                expanded={explanationExpanded}
-                onToggleExpand={() => setExplanationExpanded(!explanationExpanded)}
+                expanded={true}
+                onToggleExpand={() => {/* No toggling */}}
               />
             </motion.div>
           )}

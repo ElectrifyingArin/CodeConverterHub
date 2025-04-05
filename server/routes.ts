@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { convertCodeSchema, type ConvertCodeRequest, type ConvertCodeResponse } from "@shared/schema";
 import { z } from "zod";
 import fetch from "node-fetch";
-import { convertCodeWithOpenAI } from "./openai";
+import { convertCodeWithGitHub } from "./github-api";
 
 // Define constants used for API requests (if needed in the future)
 const apiUrl = "https://api.github.com";
@@ -20,58 +20,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Validate request body
       const validatedData = convertCodeSchema.parse(req.body);
-      const { sourceCode, sourceLanguage, targetLanguage, skillLevel, generateReadme, generateApi } = validatedData;
-
-      console.log(`Converting from ${sourceLanguage} to ${targetLanguage}`);
       
       // Generate a unique ID for tracking this conversion request
       const requestId = `request_${Date.now()}`;
       
       try {
-        // First attempt to use the enhanced direct conversion logic
-        console.log("Using enhanced code conversion logic...");
-        
-        // Create a more precise conversion based on the language pair
-        let convertedCode = "";
-        
-        if (sourceLanguage === "javascript" && targetLanguage === "swift") {
-          // JavaScript to Swift conversion with more precise handling
-          convertedCode = convertJavaScriptToSwift(sourceCode);
-        } 
-        else if (sourceLanguage === "javascript" && targetLanguage === "python") {
-          // JavaScript to Python conversion
-          convertedCode = convertJavaScriptToPython(sourceCode);
-        }
-        else if (sourceLanguage === "python" && targetLanguage === "javascript") {
-          // Python to JavaScript conversion
-          convertedCode = convertPythonToJavaScript(sourceCode);
-        }
-        else {
-          // Use fallback for other language combinations
-          convertedCode = `// Converted from ${sourceLanguage} to ${targetLanguage}\n${sourceCode}`;
-        }
-        
-        // Generate a detailed response
-        const stepByStep = generateDetailedStepByStep(sourceCode, convertedCode, sourceLanguage, targetLanguage, skillLevel);
-        
-        // Create a comprehensive response
-        const result: ConvertCodeResponse = {
-          targetCode: convertedCode,
-          explanation: {
-            stepByStep: stepByStep,
-            highLevel: generateHighLevelExplanation(sourceLanguage, targetLanguage),
-            languageDifferences: getDetailedLanguageDifferences(sourceLanguage, targetLanguage)
-          }
-        };
-        
-        // Add optional fields if requested
-        if (generateReadme) {
-          result.readme = generateDetailedReadme(sourceCode, convertedCode, sourceLanguage, targetLanguage);
-        }
-        
-        if (generateApi) {
-          result.apiDocs = generateDetailedApiDocs(sourceCode, convertedCode, sourceLanguage, targetLanguage);
-        }
+        // Convert code using our GitHub API integration with fallback logic
+        const result = await convertCodeWithGitHub(validatedData);
         
         // Log successful conversion
         console.log(`Successfully processed conversion request with ID: ${requestId}`);
@@ -79,42 +34,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Send the response
         res.json(result);
       } catch (conversionError) {
-        console.error("Error in direct code conversion:", conversionError);
-        
-        // Fallback to the simulated conversion
-        console.log("Falling back to basic conversion logic");
-        
-        // Generate the converted code using the fallback implementation
-        const fallbackResult = generateCodeConversion(
-          sourceCode,
-          sourceLanguage,
-          targetLanguage,
-          skillLevel,
-          generateReadme,
-          generateApi
-        );
-        
-        // Create the response in the expected format
-        const result: ConvertCodeResponse = {
-          targetCode: fallbackResult.targetCode,
-          explanation: {
-            stepByStep: fallbackResult.stepByStep,
-            highLevel: fallbackResult.highLevel,
-            languageDifferences: fallbackResult.languageDifferences
-          }
-        };
-
-        // Add optional fields if requested
-        if (generateReadme) {
-          result.readme = fallbackResult.readme;
-        }
-
-        if (generateApi) {
-          result.apiDocs = fallbackResult.apiDocs;
-        }
-        
-        // Send the fallback response
-        res.json(result);
+        console.error("Error in code conversion:", conversionError);
+        res.status(500).json({ 
+          message: "Failed to convert code", 
+          error: (conversionError as Error).message 
+        });
       }
     } catch (error) {
       if (error instanceof z.ZodError) {

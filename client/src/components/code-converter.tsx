@@ -20,15 +20,7 @@ interface CodeExamples {
   [key: string]: string;
 }
 
-// Export the interface for code examples
-export interface CodeExamplesCollection {
-  simple: CodeExamples;
-  complex: CodeExamples;
-}
-
-// Code examples organized by complexity level and language
-export const CODE_EXAMPLES: CodeExamplesCollection = {
-  simple: {
+const CODE_EXAMPLES: CodeExamples = {
   javascript: `// Simple function to add two numbers
 function add(a, b) {
   return a + b;
@@ -187,302 +179,6 @@ add() {
 # Calculate sum of 5 and 3
 result=$(add 5 3)
 echo "The sum is: $result"`,
-  },
-  complex: {
-    javascript: `// Async data fetching with error handling
-async function fetchUserData(userId) {
-  try {
-    const response = await fetch(\`https://api.example.com/users/\${userId}\`);
-    
-    if (!response.ok) {
-      throw new Error(\`HTTP error! Status: \${response.status}\`);
-    }
-    
-    const userData = await response.json();
-    
-    // Process and transform the data
-    return {
-      ...userData,
-      fullName: \`\${userData.firstName} \${userData.lastName}\`,
-      isActive: userData.status === 'active',
-      lastLoginDate: userData.lastLogin ? new Date(userData.lastLogin) : null
-    };
-  } catch (error) {
-    console.error("Error fetching user data:", error.message);
-    return null;
-  }
-}
-
-// Usage with async/await and promise chaining
-(async () => {
-  const user = await fetchUserData(123);
-  
-  if (user) {
-    console.log(\`Found user: \${user.fullName}\`);
-    
-    // Process user data further
-    fetchUserData(user.managerId)
-      .then(manager => {
-        if (manager) {
-          console.log(\`User's manager: \${manager.fullName}\`);
-        }
-      })
-      .catch(err => console.error("Manager fetch failed:", err));
-  }
-})();`,
-
-    python: `# Data processing with classes and context managers
-import csv
-import os
-from dataclasses import dataclass
-from typing import List, Optional
-from contextlib import contextmanager
-
-@dataclass
-class Student:
-    id: int
-    name: str
-    grade: float
-    courses: List[str]
-    
-    def is_honor_roll(self) -> bool:
-        return self.grade >= 3.5
-    
-    def add_course(self, course: str) -> None:
-        if course not in self.courses:
-            self.courses.append(course)
-
-class StudentRegistry:
-    def __init__(self, data_file: str):
-        self.data_file = data_file
-        self.students = {}
-        
-    @contextmanager
-    def open_data_file(self, mode='r'):
-        """Context manager for file operations"""
-        file = open(self.data_file, mode)
-        try:
-            yield file
-        finally:
-            file.close()
-    
-    def load_students(self) -> None:
-        """Load students from CSV file"""
-        if not os.path.exists(self.data_file):
-            return
-            
-        with self.open_data_file() as file:
-            reader = csv.reader(file)
-            next(reader)  # Skip header
-            
-            for row in reader:
-                if len(row) >= 4:
-                    student_id = int(row[0])
-                    name = row[1]
-                    grade = float(row[2])
-                    courses = row[3].split(';') if row[3] else []
-                    
-                    self.students[student_id] = Student(
-                        id=student_id,
-                        name=name,
-                        grade=grade,
-                        courses=courses
-                    )
-    
-    def get_student(self, student_id: int) -> Optional[Student]:
-        """Get a student by ID"""
-        return self.students.get(student_id)
-    
-    def get_honor_roll_students(self) -> List[Student]:
-        """Get all students on the honor roll"""
-        return [s for s in self.students.values() if s.is_honor_roll()]
-
-# Usage example
-registry = StudentRegistry("students.csv")
-registry.load_students()
-
-# Find honor roll students
-honor_students = registry.get_honor_roll_students()
-print(f"Found {len(honor_students)} honor roll students")
-
-# Get a specific student
-if student := registry.get_student(12345):
-    print(f"Student {student.name} has a grade of {student.grade}")
-    student.add_course("Computer Science")
-else:
-    print("Student not found")`,
-
-    typescript: `// Generic type-safe event system
-type EventCallback<T> = (data: T) => void;
-
-class EventEmitter<EventMap extends Record<string, any>> {
-  private listeners = new Map<
-    keyof EventMap, 
-    Set<EventCallback<any>>
-  >();
-
-  public on<E extends keyof EventMap>(
-    event: E, 
-    callback: EventCallback<EventMap[E]>
-  ): this {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set());
-    }
-    this.listeners.get(event)!.add(callback);
-    return this;
-  }
-
-  public off<E extends keyof EventMap>(
-    event: E, 
-    callback: EventCallback<EventMap[E]>
-  ): this {
-    const callbacks = this.listeners.get(event);
-    if (callbacks) {
-      callbacks.delete(callback);
-      if (callbacks.size === 0) {
-        this.listeners.delete(event);
-      }
-    }
-    return this;
-  }
-
-  public emit<E extends keyof EventMap>(
-    event: E, 
-    data: EventMap[E]
-  ): boolean {
-    const callbacks = this.listeners.get(event);
-    if (!callbacks) return false;
-    
-    callbacks.forEach(callback => {
-      try {
-        callback(data);
-      } catch (error) {
-        console.error(\`Error in event \${String(event)} callback:\`, error);
-      }
-    });
-    
-    return true;
-  }
-}
-
-// Application-specific events
-interface AppEvents {
-  'user:login': { userId: string; timestamp: number };
-  'user:logout': { userId: string; timestamp: number };
-  'data:update': { entityId: string; field: string; value: any };
-}
-
-// Create typed event emitter
-const appEvents = new EventEmitter<AppEvents>();
-
-// Add strongly-typed event listeners
-appEvents.on('user:login', ({ userId, timestamp }) => {
-  console.log(\`User \${userId} logged in at \${new Date(timestamp).toISOString()}\`);
-});
-
-appEvents.on('data:update', ({ entityId, field, value }) => {
-  console.log(\`Entity \${entityId} updated: \${field} = \${value}\`);
-});
-
-// Emit events with type checking
-appEvents.emit('user:login', { 
-  userId: 'user123', 
-  timestamp: Date.now() 
-});
-
-appEvents.emit('data:update', {
-  entityId: 'entity456',
-  field: 'status',
-  value: 'active'
-});`,
-
-    java: `// Multithreaded processor with Observer pattern
-import java.util.concurrent.*;
-import java.util.*;
-
-interface ProcessListener {
-    void onProcessed(String item, boolean success);
-    void onComplete(int total, int success);
-}
-
-class WorkProcessor {
-    private final ExecutorService executor;
-    private final List<ProcessListener> listeners = new CopyOnWriteArrayList<>();
-    
-    public WorkProcessor(int threadCount) {
-        this.executor = Executors.newFixedThreadPool(threadCount);
-    }
-    
-    public void addListener(ProcessListener listener) {
-        listeners.add(listener);
-    }
-    
-    public void process(List<String> items) {
-        CompletableFuture<?>[] futures = new CompletableFuture[items.size()];
-        AtomicInteger successCount = new AtomicInteger(0);
-        
-        for (int i = 0; i < items.size(); i++) {
-            final String item = items.get(i);
-            futures[i] = CompletableFuture.runAsync(() -> {
-                boolean success = false;
-                try {
-                    // Simulate work
-                    Thread.sleep((long) (Math.random() * 1000));
-                    success = Math.random() > 0.3; // 70% success rate
-                    
-                    if (success) {
-                        successCount.incrementAndGet();
-                    }
-                } catch (Exception e) {
-                    success = false;
-                } finally {
-                    // Notify listeners about item completion
-                    for (ProcessListener listener : listeners) {
-                        listener.onProcessed(item, success);
-                    }
-                }
-            }, executor);
-        }
-        
-        // Wait for all tasks to complete
-        CompletableFuture.allOf(futures).thenRun(() -> {
-            // Notify listeners about overall completion
-            for (ProcessListener listener : listeners) {
-                listener.onComplete(items.size(), successCount.get());
-            }
-            
-            // Clean up resources
-            executor.shutdown();
-        });
-    }
-    
-    public static void main(String[] args) {
-        List<String> workItems = Arrays.asList(
-            "Task 1", "Task 2", "Task 3", "Task 4", "Task 5"
-        );
-        
-        WorkProcessor processor = new WorkProcessor(3);
-        
-        // Add a listener
-        processor.addListener(new ProcessListener() {
-            @Override
-            public void onProcessed(String item, boolean success) {
-                System.out.println(item + ": " + (success ? "Successful" : "Failed"));
-            }
-            
-            @Override
-            public void onComplete(int total, int success) {
-                System.out.println("Processing complete: " + success + "/" + total + " successful");
-            }
-        });
-        
-        // Start processing
-        processor.process(workItems);
-    }
-}`,
-
-    // Add more complex examples for other languages as needed
-  }
 };
 
 export function CodeConverter() {
@@ -494,11 +190,8 @@ export function CodeConverter() {
   const [isAnimating, setIsAnimating] = useState(false);
   const { toast } = useToast();
   
-  // Add state for complexity level
-  const [complexityLevel, setComplexityLevel] = useState<"simple" | "complex">("simple");
-  
-  // Source code state - initialize empty 
-  const [sourceCode, setSourceCode] = useState("");
+  // Use the example for the selected language, or default to JavaScript
+  const [sourceCode, setSourceCode] = useState(CODE_EXAMPLES.javascript);
 
   const {
     convert,
@@ -508,17 +201,6 @@ export function CodeConverter() {
     runOutput,
     clearOutput,
   } = useCodeConversion();
-
-  // Update source code when language or complexity changes
-  useEffect(() => {
-    const langExamples = CODE_EXAMPLES[complexityLevel];
-    if (langExamples && langExamples[sourceLanguage]) {
-      setSourceCode(langExamples[sourceLanguage]);
-    } else {
-      // Fallback to JavaScript if the language isn't in our examples
-      setSourceCode(CODE_EXAMPLES.simple.javascript);
-    }
-  }, [sourceLanguage, complexityLevel]);
 
   const handleConvertCode = () => {
     if (!sourceCode?.trim()) {
@@ -578,8 +260,18 @@ export function CodeConverter() {
     setTargetLanguage(tempLang);
   };
 
-  // Ensure source and target languages are different
+  // Make sure languages are different and update source code
   useEffect(() => {
+    // Update source code when language changes - safely access as key
+    const langExample = sourceLanguage as keyof typeof CODE_EXAMPLES;
+    if (CODE_EXAMPLES[langExample]) {
+      setSourceCode(CODE_EXAMPLES[langExample]);
+    } else {
+      // Fallback to JavaScript if the language isn't in our examples
+      setSourceCode(CODE_EXAMPLES.javascript);
+    }
+    
+    // Ensure source and target languages are different
     if (sourceLanguage === targetLanguage) {
       // Default to Python if JavaScript is selected for both
       if (sourceLanguage === "javascript") {
@@ -640,28 +332,6 @@ export function CodeConverter() {
             onChange={setSkillLevel}
           />
           
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Example Complexity</label>
-            <div className="flex space-x-3">
-              <Button
-                variant={complexityLevel === "simple" ? "default" : "outline"}
-                size="sm" 
-                onClick={() => setComplexityLevel("simple")}
-                className="flex-1"
-              >
-                Simple
-              </Button>
-              <Button
-                variant={complexityLevel === "complex" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setComplexityLevel("complex")}
-                className="flex-1"
-              >
-                Complex
-              </Button>
-            </div>
-          </div>
-          
           <Button
             className="w-full py-6 bg-primary hover:bg-primary/90 text-white rounded-lg shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center"
             onClick={handleConvertCode}
@@ -704,14 +374,6 @@ export function CodeConverter() {
                 id="generate-readme"
                 checked={generateReadme}
                 onCheckedChange={setGenerateReadme}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="generate-api" className="text-sm">Generate API Docs</Label>
-              <Switch
-                id="generate-api"
-                checked={generateApi}
-                onCheckedChange={setGenerateApi}
               />
             </div>
           </div>

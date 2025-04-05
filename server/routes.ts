@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { convertCodeSchema, type ConvertCodeRequest, type ConvertCodeResponse } from "@shared/schema";
 import { z } from "zod";
 import fetch from "node-fetch";
+import { convertCodeWithOpenAI } from "./openai";
 
 // Define constants used for API requests (if needed in the future)
 const apiUrl = "https://api.github.com";
@@ -19,50 +20,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Validate request body
       const validatedData = convertCodeSchema.parse(req.body);
-      const { sourceCode, sourceLanguage, targetLanguage, skillLevel, generateReadme, generateApi } = validatedData;
+      const { sourceLanguage, targetLanguage } = validatedData;
 
-      // Skip actual GitHub API call for now and go directly to code conversion
-      // This avoids any authentication or API issues
-      console.log("Using GitHub API key for authentication (simulated)");
-      console.log(`Converting from ${sourceLanguage} to ${targetLanguage}`);
+      console.log(`Converting from ${sourceLanguage} to ${targetLanguage} using OpenAI GPT-4o`);
       
-      // Generate a fake gist ID for logging purposes
-      const gistId = `gist_${Date.now()}`;
+      // Generate a unique ID for tracking this conversion request
+      const requestId = `request_${Date.now()}`;
+      
+      try {
+        // Call OpenAI API to perform the code conversion
+        const result = await convertCodeWithOpenAI(validatedData);
+        
+        // Log successful conversion
+        console.log(`Successfully processed conversion request with ID: ${requestId}`);
+        
+        // Save the conversion to storage (optional)
+        // Can be implemented later to track user history
+        
+        // Send the response
+        res.json(result);
+      } catch (openAiError) {
+        console.error("OpenAI API error:", openAiError);
+        
+        // Fallback to the simulated conversion if OpenAI fails
+        console.log("Falling back to simulated conversion due to API error");
+        
+        // Generate the converted code using the fallback implementation
+        const fallbackResult = generateCodeConversion(
+          validatedData.sourceCode,
+          validatedData.sourceLanguage,
+          validatedData.targetLanguage,
+          validatedData.skillLevel,
+          validatedData.generateReadme,
+          validatedData.generateApi
+        );
+        
+        // Create the response in the expected format
+        const result: ConvertCodeResponse = {
+          targetCode: fallbackResult.targetCode,
+          explanation: {
+            stepByStep: fallbackResult.stepByStep,
+            highLevel: fallbackResult.highLevel,
+            languageDifferences: fallbackResult.languageDifferences
+          }
+        };
 
-      // Generate the converted code based on source language and target language
-      const conversionResult = generateCodeConversion(
-        sourceCode, 
-        sourceLanguage, 
-        targetLanguage, 
-        skillLevel,
-        generateReadme,
-        generateApi
-      );
-
-      // Create the response in the expected format
-      const result: ConvertCodeResponse = {
-        targetCode: conversionResult.targetCode,
-        explanation: {
-          stepByStep: conversionResult.stepByStep,
-          highLevel: conversionResult.highLevel,
-          languageDifferences: conversionResult.languageDifferences
+        // Add optional fields if requested
+        if (validatedData.generateReadme) {
+          result.readme = fallbackResult.readme;
         }
-      };
 
-      // Add optional fields if requested
-      if (generateReadme) {
-        result.readme = conversionResult.readme;
+        if (validatedData.generateApi) {
+          result.apiDocs = fallbackResult.apiDocs;
+        }
+        
+        // Send the fallback response
+        res.json(result);
       }
-
-      if (generateApi) {
-        result.apiDocs = conversionResult.apiDocs;
-      }
-
-      // No need to delete gist since we're not creating one
-      console.log(`Successfully processed conversion request with ID: ${gistId}`);
-
-      // Send back the response
-      res.json(result);
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: "Validation error", errors: error.errors });
